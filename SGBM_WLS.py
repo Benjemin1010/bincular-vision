@@ -2,6 +2,20 @@ import cv2
 import time
 import numpy as np
 import math
+# import pcl
+# import pcl.pcl_visualization
+def preprocess(img1, img2):
+    # 彩色图->灰度图
+    if (img1.ndim == 3):  # 判断为三维数组
+        img1 = cv2.cvtColor(img1, cv2.COLOR_BGR2GRAY)  # 通过OpenCV加载的图像通道顺序是BGR
+    if (img2.ndim == 3):
+        img2 = cv2.cvtColor(img2, cv2.COLOR_BGR2GRAY)
+
+    # 直方图均衡
+    img1 = cv2.equalizeHist(img1)
+    img2 = cv2.equalizeHist(img2)
+
+    return img1, img2
 
 left_camera_matrix = np.array([[725.221505461947, 0., 0.],
                                [-0.0848937730328429, 726.444401474590, 0.],
@@ -64,17 +78,23 @@ while True:
     frame1 = frame[0:720, 0:1280]
     frame2 = frame[0:720, 1280:2560]
     # 将图片置为灰度图
-    imgL = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
-    imgR = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
+    frame1 = cv2.cvtColor(frame1, cv2.COLOR_BGR2GRAY)
+    frame2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
     # 重映射，就是把一幅图像中某位置的像素放置到另一个图片指定位置的过程。
     # 依据MATLAB测量数据重建无畸变图片,输入图片要求为灰度图
-    img1_rectified = cv2.remap(imgL, left_map1, left_map2, cv2.INTER_LINEAR)
-    img2_rectified = cv2.remap(imgR, right_map1, right_map2, cv2.INTER_LINEAR)
+    # img1_rectified = cv2.remap(frame1, left_map1, left_map2, cv2.INTER_AREA)
+    # img2_rectified = cv2.remap(frame2, right_map1, right_map2, cv2.INTER_AREA)
+    #
+    # # 消除畸变
+    # frame1 = cv2.undistort(frame1, left_camera_matrix, left_distortion)
+    # frame2 = cv2.undistort(frame2, right_camera_matrix, right_distortion)
+    # # 立体匹配
+    # iml_, imr_ = preprocess(frame1, frame2)  # 预处理，一般可以削弱光照不均的影响，不做也可以
 
     # 转换为opencv的BGR格式
-    imageL = cv2.cvtColor(img1_rectified, cv2.COLOR_GRAY2BGR)
-    imageR = cv2.cvtColor(img2_rectified, cv2.COLOR_GRAY2BGR)
+    # imageL = cv2.cvtColor(img1_rectified, cv2.COLOR_GRAY2BGR)
+    # imageR = cv2.cvtColor(img2_rectified, cv2.COLOR_GRAY2BGR)
 
     # ------------------------------------SGBM算法----------------------------------------------------------
     #   blockSize                   深度图成块，blocksize越低，其深度图就越零碎，0<blockSize<10
@@ -96,38 +116,44 @@ while True:
 
     blockSize = 3
     # num = 13
-    num = 13
+    num = 4
     img_channels = 3
     minDisparity = 0
 
-    stereo = cv2.StereoSGBM_create(minDisparity=minDisparity,
-                                   numDisparities=num * 16,
-                                   blockSize=blockSize,
-                                   P1=8 * img_channels * blockSize * blockSize,
-                                   P2=32 * img_channels * blockSize * blockSize,
-                                   disp12MaxDiff=-1,
-                                   preFilterCap=1,
-                                   uniquenessRatio=10,
-                                   speckleWindowSize=100,
-                                   speckleRange=100,
-                                   mode=cv2.STEREO_SGBM_MODE_HH)
-    # 计算视差
-    disparity = stereo.compute(img1_rectified, img2_rectified)
-    # 归一化函数算法，生成深度图（灰度图）
-    disp = cv2.normalize(disparity, disparity, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-    # 生成深度图（颜色图）
-    dis_color = disparity
-    dis_color = cv2.normalize(dis_color, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX, dtype=cv2.CV_8U)
-    dis_color = cv2.applyColorMap(dis_color, 2)
-    # 计算三维坐标数据值
-    threeD = cv2.reprojectImageTo3D(disparity, Q, handleMissingValues=True)
-    # # 计算出的threeD，需要乘以16，才等于现实中的距离
-    threeD = threeD * 16
+    left_matcher = cv2.StereoSGBM_create(
+        minDisparity=0,
+        numDisparities=4*16,  # max_disp has to be dividable by 16 f. E. HH 192, 256
+        blockSize=1,
+        P1=216,
+        P2=864,
+        preFilterCap=63,
+        mode=cv2.STEREO_SGBM_MODE_HH
+    )
 
-    cv2.imshow("left", img1_rectified)
-    cv2.imshow("right", img2_rectified)
+    right_matcher = cv2.ximgproc.createRightMatcher(left_matcher)
+    wls_filter = cv2.ximgproc.createDisparityWLSFilter(matcher_left=left_matcher)
+    wls_filter.setLambda(80000.)
+    wls_filter.setSigmaColor(1.2)
+    displ = left_matcher.compute(frame1, frame2)  # .astype(np.float32)/16
+    dispr = right_matcher.compute(frame2, frame1)  # .astype(np.float32)/16
+
+    displ = np.int16(displ)
+    dispr = np.int16(dispr)
+
+    filteredImg = wls_filter.filter(displ, frame1, None, dispr)  # important to put "imgL" here!!!
+
+    filteredImg = cv2.normalize(src=filteredImg, dst=filteredImg, beta=0, alpha=255, norm_type=cv2.NORM_MINMAX);
+    filteredImg = np.uint8(filteredImg)
+
+    # 计算三维坐标数据值
+    threeD = cv2.reprojectImageTo3D(filteredImg, Q, handleMissingValues=True)
+    # # 计算出的threeD，需要乘以16，才等于现实中的距离
+    # threeD = threeD * 16
+
+    # cv2.imshow("left", img1_rectified)
+    # cv2.imshow("right", img2_rectified)
     # cv2.imshow("depth", disp)
-    cv2.imshow("depth", dis_color)
+    cv2.imshow("depth", filteredImg)
 
     key = cv2.waitKey(1)
     if key == ord("q"):
