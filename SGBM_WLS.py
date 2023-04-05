@@ -17,25 +17,26 @@ def preprocess(img1, img2):
 
     return img1, img2
 
-left_camera_matrix = np.array([[725.221505461947, 0., 0.],
-                               [-0.0848937730328429, 726.444401474590, 0.],
-                               [616.817617761929, 353.889661421403, 1.]])
+left_camera_matrix_tmp = np.array([[748.537220645527, 0., 0.],
+                               [-0.171086862715876, 748.573756045103, 0.],
+                               [620.640398806220, 347.086603859931, 1.]])
+left_camera_matrix = np.transpose(left_camera_matrix_tmp)
 
 # left_distortion = np.array([[0.0707605491596689, 0.113247907007358, -0.00257192165876870, -0.00297103442720558, -0.415081075926139]])
 # left_distortion = np.array([[0.156608615700261, -0.269277128984164, 0.00103312627053495, -0.00104941393517511, 0.101856408758518]])
-left_distortion = np.array([[0., -0., 0.00103312627053495, -0.00104941393517511, 0.]])
-right_camera_matrix = np.array([[725.864821487200, 0., 0.],
-                                [1.11035482054761, 727.428955547968, 0.],
-                                [633.586698574547, 339.799672365552, 1.]])
-
+left_distortion = np.array([[0.120541339996878, -0.168740153755222, 0.000629843118552386, 0.00179348606459091, 0.]])
+right_camera_matrix_tmp = np.array([[749.431315379533, 0., 0.],
+                                [0.281799638767653, 749.479276057008, 0.],
+                                [636.070081876925, 332.758745657899, 1.]])
+right_camera_matrix = np.transpose(right_camera_matrix_tmp)
 # right_distortion = np.array([[0.106232229280971, -0.0853015042338415, -0.00365385125267755, -0.00537841211975069, -0.128909796065427]])
 # right_distortion = np.array([[0.158082004297845, -0.267853407652530, 0.000149695995072505, -0.000911479619948412, 0.0983556013356118]])
-right_distortion = np.array([[0., -0., 0.000149695995072505, -0.000911479619948412, 0.]])
-R = np.array([[0.999974988968334, -0.000727834478437193, 0.00703503338676566],
-              [0.000783601209083440, 0.999968269854069, -0.00792749987095869],
-              [-0.00702904025639578, 0.00793281425667620, 0.999943829947984]])  # 旋转向量
+right_distortion = np.array([[0.0974510265399204, -0.0838075072715433, -0.000628940465316651, 0.000254655741183247, 0.]])
+R = np.array([[0.999991101510547, -0.000820710991406780, 0.00413803494327793],
+              [0.000856689010869184, 0.999961785513621, -0.00870020668427976],
+              [-0.00413073645514466, 0.00870367427464484, 0.999953590458307]])  # 旋转向量
 
-T = np.array([-60.3017099163414, 0.340461438339016, -0.377981234460957])  # 平移关系向量TranslationOfCamera2
+T = np.array([-59.4156595079536, -0.118520398706135, -1.39762490025346])  # 平移关系向量TranslationOfCamera2
 
 size = (1280, 720)  # 图像尺寸
 
@@ -122,18 +123,25 @@ while True:
 
     left_matcher = cv2.StereoSGBM_create(
         minDisparity=0,
-        numDisparities=4*16,  # max_disp has to be dividable by 16 f. E. HH 192, 256
-        blockSize=1,
-        P1=216,
-        P2=864,
+        numDisparities=7*16,  # max_disp has to be dividable by 16 f. E. HH 192, 256
+        blockSize=3,
+        disp12MaxDiff=1,
+        uniquenessRatio=15,
+        speckleWindowSize=100,
+        speckleRange=1,
+        P1=8 * img_channels * blockSize ** 2,
+        P2=32 * img_channels * blockSize ** 2,
         preFilterCap=63,
-        mode=cv2.STEREO_SGBM_MODE_HH
+        mode=cv2.STEREO_SGBM_MODE_SGBM_3WAY
     )
 
     right_matcher = cv2.ximgproc.createRightMatcher(left_matcher)
     wls_filter = cv2.ximgproc.createDisparityWLSFilter(matcher_left=left_matcher)
-    wls_filter.setLambda(80000.)
-    wls_filter.setSigmaColor(1.2)
+    wls_filter.setLambda(8000.)
+    wls_filter.setSigmaColor(2.0)
+    wls_filter.setLRCthresh(24)
+    wls_filter.setDepthDiscontinuityRadius(3)
+
     displ = left_matcher.compute(frame1, frame2)  # .astype(np.float32)/16
     dispr = right_matcher.compute(frame2, frame1)  # .astype(np.float32)/16
 

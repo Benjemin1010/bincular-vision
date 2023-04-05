@@ -1,8 +1,8 @@
 import cv2
 import time
 import numpy
-AUTO = False  # 自动拍照，或手动按s键拍照
-INTERVAL = 5 # 自动拍照间隔
+AUTO = True  # 自动拍照，或手动按s键拍照
+INTERVAL = 3 # 自动拍照间隔
 #H,W,3
 cv2.namedWindow("left")
 cv2.namedWindow("right")
@@ -12,7 +12,7 @@ cv2.moveWindow("right", 400, 0)
 right_camera = cv2.VideoCapture(0)# 根据情况设定相机id
 right_camera.set(3, 2560)  # width=1920
 right_camera.set(4, 720)  # height=1080
-counter = 8#图片命名的起始数字
+counter = 1#图片命名的起始数字
 utc = time.time()
 pattern = (9, 6) # 棋盘格尺寸
 cell_size= 3.68
