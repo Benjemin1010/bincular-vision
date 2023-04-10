@@ -131,6 +131,7 @@ while cap.isOpened():
     # # 计算出的threeD，需要乘以16，才等于现实中的距离
     threeD = threeD * 16
 
+
     cv2.imshow("left", img1_rectified)
     cv2.imshow("right", img2_rectified)
     # cv2.imshow("depth", disp)

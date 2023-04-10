@@ -75,7 +75,40 @@ fps = cap.get(cv2.CAP_PROP_FPS)
 # 获取视频流的总帧数
 fcount = cap.get(cv2.CAP_PROP_FRAME_COUNT)
 # 跳到某一感兴趣帧并从此帧开始读取,如从第360帧开始读取
-cap.set(cv2.CAP_PROP_POS_FRAMES, 4/5*fcount)
+# cap.set(cv2.CAP_PROP_POS_FRAMES, 4/5*fcount)
+blockSize = 3
+# num = 13
+num = 8
+img_channels = 3
+minDisparity = 0
+# ------------------------------------SGBM算法----------------------------------------------------------
+#   blockSize                   深度图成块，blocksize越低，其深度图就越零碎，0<blockSize<10
+#   img_channels                BGR图像的颜色通道，img_channels=3，不可更改
+#   numDisparities              SGBM感知的范围，越大生成的精度越好，速度越慢，需要被16整除，如numDisparities
+#                               取16、32、48、64等
+#   mode                        sgbm算法选择模式，以速度由快到慢为：STEREO_SGBM_MODE_SGBM_3WAY、
+#                               STEREO_SGBM_MODE_HH4、STEREO_SGBM_MODE_SGBM、STEREO_SGBM_MODE_HH。精度反之
+# ------------------------------------------------------------------------------------------------------
+left_matcher = cv2.StereoSGBM_create(
+    minDisparity=0,
+    numDisparities=num * 16,
+    blockSize=3,
+    disp12MaxDiff=1,
+    uniquenessRatio=15,
+    speckleWindowSize=200,
+    speckleRange=1,
+    P1=8 * img_channels * blockSize ** 2,
+    P2=32 * img_channels * blockSize ** 2,
+    preFilterCap=63,
+    mode=cv2.STEREO_SGBM_MODE_SGBM_3WAY
+)
+
+right_matcher = cv2.ximgproc.createRightMatcher(left_matcher)
+wls_filter = cv2.ximgproc.createDisparityWLSFilter(matcher_left=left_matcher)
+wls_filter.setLambda(8000.)
+wls_filter.setSigmaColor(2.0)
+wls_filter.setLRCthresh(24)
+wls_filter.setDepthDiscontinuityRadius(3)
 
 while cap.isOpened():
     ret, frame = cap.read()
@@ -90,46 +123,46 @@ while cap.isOpened():
     frame2 = cv2.cvtColor(frame2, cv2.COLOR_BGR2GRAY)
 
     # 三个trackbar用来调节不同的参数查看效果，确定参数后就不需要了
-    num = cv2.getTrackbarPos("num", "depth")
-    blockSize = cv2.getTrackbarPos("blockSize", "depth")
-    minDisparity = cv2.getTrackbarPos("minDisparity", "depth")
+    # num = cv2.getTrackbarPos("num", "depth")
+    # blockSize = cv2.getTrackbarPos("blockSize", "depth")
+    # minDisparity = cv2.getTrackbarPos("minDisparity", "depth")
+    #
+    # if blockSize % 2 == 0:
+    #     blockSize += 1
 
-    if blockSize % 2 == 0:
-        blockSize += 1
-
-    blockSize = 3
-    # num = 13
-    num = 7
-    img_channels = 3
-    minDisparity = 0
-    # ------------------------------------SGBM算法----------------------------------------------------------
-    #   blockSize                   深度图成块，blocksize越低，其深度图就越零碎，0<blockSize<10
-    #   img_channels                BGR图像的颜色通道，img_channels=3，不可更改
-    #   numDisparities              SGBM感知的范围，越大生成的精度越好，速度越慢，需要被16整除，如numDisparities
-    #                               取16、32、48、64等
-    #   mode                        sgbm算法选择模式，以速度由快到慢为：STEREO_SGBM_MODE_SGBM_3WAY、
-    #                               STEREO_SGBM_MODE_HH4、STEREO_SGBM_MODE_SGBM、STEREO_SGBM_MODE_HH。精度反之
-    # ------------------------------------------------------------------------------------------------------
-    left_matcher = cv2.StereoSGBM_create(
-        minDisparity=0,
-        numDisparities=num*16,
-        blockSize=3,
-        disp12MaxDiff=1,
-        uniquenessRatio=15,
-        speckleWindowSize=100,
-        speckleRange=1,
-        P1=8 * img_channels * blockSize ** 2,
-        P2=32 * img_channels * blockSize ** 2,
-        preFilterCap=63,
-        mode=cv2.STEREO_SGBM_MODE_SGBM_3WAY
-    )
-
-    right_matcher = cv2.ximgproc.createRightMatcher(left_matcher)
-    wls_filter = cv2.ximgproc.createDisparityWLSFilter(matcher_left=left_matcher)
-    wls_filter.setLambda(8000.)
-    wls_filter.setSigmaColor(2.0)
-    wls_filter.setLRCthresh(24)
-    wls_filter.setDepthDiscontinuityRadius(3)
+    # blockSize = 3
+    # # num = 13
+    # num = 7
+    # img_channels = 3
+    # minDisparity = 0
+    # # ------------------------------------SGBM算法----------------------------------------------------------
+    # #   blockSize                   深度图成块，blocksize越低，其深度图就越零碎，0<blockSize<10
+    # #   img_channels                BGR图像的颜色通道，img_channels=3，不可更改
+    # #   numDisparities              SGBM感知的范围，越大生成的精度越好，速度越慢，需要被16整除，如numDisparities
+    # #                               取16、32、48、64等
+    # #   mode                        sgbm算法选择模式，以速度由快到慢为：STEREO_SGBM_MODE_SGBM_3WAY、
+    # #                               STEREO_SGBM_MODE_HH4、STEREO_SGBM_MODE_SGBM、STEREO_SGBM_MODE_HH。精度反之
+    # # ------------------------------------------------------------------------------------------------------
+    # left_matcher = cv2.StereoSGBM_create(
+    #     minDisparity=0,
+    #     numDisparities=num*16,
+    #     blockSize=3,
+    #     disp12MaxDiff=1,
+    #     uniquenessRatio=15,
+    #     speckleWindowSize=100,
+    #     speckleRange=1,
+    #     P1=8 * img_channels * blockSize ** 2,
+    #     P2=32 * img_channels * blockSize ** 2,
+    #     preFilterCap=63,
+    #     mode=cv2.STEREO_SGBM_MODE_SGBM_3WAY
+    # )
+    #
+    # right_matcher = cv2.ximgproc.createRightMatcher(left_matcher)
+    # wls_filter = cv2.ximgproc.createDisparityWLSFilter(matcher_left=left_matcher)
+    # wls_filter.setLambda(8000.)
+    # wls_filter.setSigmaColor(2.0)
+    # wls_filter.setLRCthresh(24)
+    # wls_filter.setDepthDiscontinuityRadius(3)
 
     displ = left_matcher.compute(frame1, frame2)  # .astype(np.float32)/16
     dispr = right_matcher.compute(frame2, frame1)  # .astype(np.float32)/16
