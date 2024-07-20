@@ -1,137 +1,40 @@
-load checkpoint from local path: ./ckpts/renderocc-7frame-12e.pth
-[                                                  ] 0/81, elapsed: 0s, ETA:Traceback (most recent call last):
-  File "./tools/test.py", line 269, in <module>
-    main()
-  File "./tools/test.py", line 246, in main
-    outputs = multi_gpu_test(model, data_loader, args.dump_dir,
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/apis/test.py", line 71, in multi_gpu_test
-    for i, data in enumerate(data_loader):
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 521, in __next__
-    data = self._next_data()
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1203, in _next_data
-    return self._process_data(data)
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1229, in _process_data
-    data.reraise()
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/_utils.py", line 434, in reraise
-    raise exception
-KeyError: Caught KeyError in DataLoader worker process 0.
-Original Traceback (most recent call last):
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/_utils/worker.py", line 287, in _worker_loop
-    data = fetcher.fetch(index)
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in fetch
-    data = [self.dataset[idx] for idx in possibly_batched_index]
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in <listcomp>
-    data = [self.dataset[idx] for idx in possibly_batched_index]
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/custom_3d.py", line 433, in __getitem__
-    return self.prepare_test_data(idx)
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/custom_3d.py", line 245, in prepare_test_data
-    input_dict = self.get_data_info(index)
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/nuscenes_dataset_occ.py", line 156, in get_data_info
-    input_dict = super(NuScenesDatasetOccpancy, self).get_data_info(index)
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/nuscenes_dataset.py", line 241, in get_data_info
-    scene_name=info['scene_name'],
-KeyError: 'scene_name'
-
+/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/pipelines/loading.py:1199: UserWarning: Creating a tensor from a list of numpy.ndarrays is extremely slow. Please consider converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor. (Triggered internally at  ../torch/csrc/utils/tensor_new.cpp:201.)
+  gt_boxes, gt_labels = torch.Tensor(gt_boxes), torch.tensor(gt_labels)
+python: /opt/conda/conda-bld/magma-cuda111_1605822518874/work/interface_cuda/interface.cpp:899: void magma_queue_create_from_cuda_internal(magma_device_t, cudaStream_t, cublasHandle_t, cusparseHandle_t, magma_queue**, const char*, const char*, int): Assertion `queue->dBarray__ != __null' failed.
+WARNING:torch.distributed.elastic.multiprocessing.api:Sending process 112563 closing signal SIGTERM
+WARNING:torch.distributed.elastic.multiprocessing.api:Sending process 112564 closing signal SIGTERM
+WARNING:torch.distributed.elastic.multiprocessing.api:Sending process 112566 closing signal SIGTERM
+ERROR:torch.distributed.elastic.multiprocessing.api:failed (exitcode: -6) local_rank: 2 (pid: 112565) of binary: /opt/conda/envs/open-mmlab-bevfusion/bin/python
 Traceback (most recent call last):
-  File "./tools/test.py", line 269, in <module>
+  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/runpy.py", line 194, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/runpy.py", line 87, in _run_code
+    exec(code, run_globals)
+  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/distributed/launch.py", line 193, in <module>
     main()
-  File "./tools/test.py", line 246, in main
-    outputs = multi_gpu_test(model, data_loader, args.dump_dir,
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/apis/test.py", line 71, in multi_gpu_test
-    for i, data in enumerate(data_loader):
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 521, in __next__
-    data = self._next_data()
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1203, in _next_data
-    return self._process_data(data)
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1229, in _process_data
-    data.reraise()
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/_utils.py", line 434, in reraise
-    raise exception
-KeyError: Caught KeyError in DataLoader worker process 0.
-Original Traceback (most recent call last):
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/_utils/worker.py", line 287, in _worker_loop
-    data = fetcher.fetch(index)
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in fetch
-    data = [self.dataset[idx] for idx in possibly_batched_index]
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in <listcomp>
-    data = [self.dataset[idx] for idx in possibly_batched_index]
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/custom_3d.py", line 433, in __getitem__
-    return self.prepare_test_data(idx)
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/custom_3d.py", line 245, in prepare_test_data
-    input_dict = self.get_data_info(index)
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/nuscenes_dataset_occ.py", line 156, in get_data_info
-    input_dict = super(NuScenesDatasetOccpancy, self).get_data_info(index)
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/nuscenes_dataset.py", line 241, in get_data_info
-    scene_name=info['scene_name'],
-KeyError: 'scene_name'
-
-Traceback (most recent call last):
-  File "./tools/test.py", line 269, in <module>
-    main()
-  File "./tools/test.py", line 246, in main
-    outputs = multi_gpu_test(model, data_loader, args.dump_dir,
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/apis/test.py", line 71, in multi_gpu_test
-    for i, data in enumerate(data_loader):
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 521, in __next__
-    data = self._next_data()
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1203, in _next_data
-    return self._process_data(data)
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1229, in _process_data
-    data.reraise()
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/_utils.py", line 434, in reraise
-    raise exception
-KeyError: Caught KeyError in DataLoader worker process 0.
-Original Traceback (most recent call last):
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/_utils/worker.py", line 287, in _worker_loop
-    data = fetcher.fetch(index)
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in fetch
-    data = [self.dataset[idx] for idx in possibly_batched_index]
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in <listcomp>
-    data = [self.dataset[idx] for idx in possibly_batched_index]
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/custom_3d.py", line 433, in __getitem__
-    return self.prepare_test_data(idx)
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/custom_3d.py", line 245, in prepare_test_data
-    input_dict = self.get_data_info(index)
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/nuscenes_dataset_occ.py", line 156, in get_data_info
-    input_dict = super(NuScenesDatasetOccpancy, self).get_data_info(index)
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/nuscenes_dataset.py", line 241, in get_data_info
-    scene_name=info['scene_name'],
-KeyError: 'scene_name'
-
-Traceback (most recent call last):
-  File "./tools/test.py", line 269, in <module>
-    main()
-  File "./tools/test.py", line 246, in main
-    outputs = multi_gpu_test(model, data_loader, args.dump_dir,
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/apis/test.py", line 71, in multi_gpu_test
-    for i, data in enumerate(data_loader):
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 521, in __next__
-    data = self._next_data()
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1203, in _next_data
-    return self._process_data(data)
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/dataloader.py", line 1229, in _process_data
-    data.reraise()
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/_utils.py", line 434, in reraise
-    raise exception
-KeyError: Caught KeyError in DataLoader worker process 0.
-Original Traceback (most recent call last):
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/_utils/worker.py", line 287, in _worker_loop
-    data = fetcher.fetch(index)
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in fetch
-    data = [self.dataset[idx] for idx in possibly_batched_index]
-  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/utils/data/_utils/fetch.py", line 49, in <listcomp>
-    data = [self.dataset[idx] for idx in possibly_batched_index]
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/custom_3d.py", line 433, in __getitem__
-    return self.prepare_test_data(idx)
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/custom_3d.py", line 245, in prepare_test_data
-    input_dict = self.get_data_info(index)
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/nuscenes_dataset_occ.py", line 156, in get_data_info
-    input_dict = super(NuScenesDatasetOccpancy, self).get_data_info(index)
-  File "/cpfs/user/pengwan5/RenderOcc/RenderOcc/mmdet3d/datasets/nuscenes_dataset.py", line 241, in get_data_info
-    scene_name=info['scene_name'],
-KeyError: 'scene_name'
-
-WARNING:torch.distributed.elastic.multiprocessing.api:Sending process 78112 closing signal SIGTERM
-WARNING:torch.distributed.elastic.multiprocessing.api:Sending process 78114 closing signal SIGTERM
-WARNING:torch.distributed.elastic.multiprocessing.api:Sending process 78115 closing signal SIGTERM
-ERROR:torch.distributed.elastic.multiprocessing.api:failed (exitcode: 1) local_rank: 1 (pid: 78113) of binary: /opt/conda/envs/open-mmlab-bevfusion/bin/python
+  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/distributed/launch.py", line 189, in main
+    launch(args)
+  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/distributed/launch.py", line 174, in launch
+    run(args)
+  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/distributed/run.py", line 710, in run
+    elastic_launch(
+  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/distributed/launcher/api.py", line 131, in __call__
+    return launch_agent(self._config, self._entrypoint, list(args))
+  File "/opt/conda/envs/open-mmlab-bevfusion/lib/python3.8/site-packages/torch/distributed/launcher/api.py", line 259, in launch_agent
+    raise ChildFailedError(
+torch.distributed.elastic.multiprocessing.errors.ChildFailedError: 
+=======================================================
+./tools/train.py FAILED
+-------------------------------------------------------
+Failures:
+  <NO_OTHER_FAILURES>
+-------------------------------------------------------
+Root Cause (first observed failure):
+[0]:
+  time      : 2024-07-20_13:44:42
+  host      : dsw-4392-788566f7d4-wx58n
+  rank      : 2 (local_rank: 2)
+  exitcode  : -6 (pid: 112565)
+  error_file: <N/A>
+  traceback : Signal 6 (SIGABRT) received by PID 112565
+=======================================================
